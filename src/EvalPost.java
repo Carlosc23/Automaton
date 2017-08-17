@@ -1,11 +1,8 @@
+import org.graphstream.graph.Edge;
+
 import javax.swing.*;
 import java.util.*;
 
-/**
- * @author Carlos Calderon
- * @version 6.0
- * Clase que se encarga de hacer las operaciones del automata.
- */
 public class EvalPost {
     /*Atributos*/
     private Stack<String> E = new Stack<String>(); //Pila entrada
@@ -14,9 +11,10 @@ public class EvalPost {
     private Stack<NFA> operands = new Stack<NFA>();
     private String sim = "";
     private ArrayList<String> sim2 = new ArrayList<String>();
+
     /**
      * @param expr Expresion regular ingresada por el usuario ya en postfix.
-     * Metodo para anadir la expresion ya en postfix a un Stack.
+     *             Metodo para anadir la expresion ya en postfix a un Stack.
      */
     void anadirExpresion(String expr) {
         String[] post = expr.split(" ");
@@ -110,30 +108,29 @@ public class EvalPost {
             }
         }
         //Construir automatas
-        String tiempos="",tiempos2="";
-        NFA nfa =operands.elementAt(0);
-        DFA dfa=nfaToDFA( nfa,this.sim2);
+        String tiempos = "", tiempos2 = "";
+        NFA nfa = operands.elementAt(0);
+        DFA dfa = nfaToDFA(nfa, this.sim2);
         // Simulacion y toma de tiempos
         String reg2 = JOptionPane.showInputDialog("Ingrese una expresion");
         long startTime4 = System.nanoTime();
-        System.out.println( simulacionDFA(reg2,dfa));
+        System.out.println(simulacionDFA(reg2, dfa));
         long stopTime4 = System.nanoTime();
-        tiempos = simulacionDFA(reg2,dfa);
-        tiempos += "\r\nTiempo de simulacion a AFN:"+(stopTime4 - startTime4)+" ns";
-        System.out.println("Simulacion a AFN:"+(stopTime4 - startTime4));
+        tiempos = simulacionDFA(reg2, dfa);
+        tiempos += "\r\nTiempo de simulacion a AFD:" + (stopTime4 - startTime4) + " ns";
+        System.out.println("Simulacion a AFD:" + (stopTime4 - startTime4));
         long startTime3 = System.nanoTime();
-        System.out.println( simulacionNFA(reg2,nfa));
+        System.out.println(simulacionNFA(reg2, nfa));
         long stopTime3 = System.nanoTime();
-        tiempos2=simulacionNFA(reg2,nfa);
-        tiempos2+="\r\nTiempo de simulacion a AFD:"+(stopTime3 - startTime3)+" ns";
-        System.out.println("Simulacion a AFD:"+(stopTime3 - startTime3));
+        tiempos2 = simulacionNFA(reg2, nfa);
+        tiempos2 += "\r\nTiempo de simulacion a AFN:" + (stopTime3 - startTime3) + " ns";
+        System.out.println("Simulacion a AFN:" + (stopTime3 - startTime3));
         //Generar textos
-        nfa.generarTxt(this.sim,tiempos);
-        dfa.generarTxt(this.sim,tiempos2);
+       // nfa.generarTxt(this.sim, tiempos);
+       // dfa.generarTxt(this.sim, tiempos2);
         //Desplegar grafos
         nfa.desplegarGrafo();
         dfa.desplegarGrafo();
-
 
 
     }
@@ -174,7 +171,7 @@ public class EvalPost {
      */
     NFA concat(NFA a, NFA b) {
         NFA result = new NFA();
-        result.setVertex(a.get_vertex_count() + b.get_vertex_count()-1);
+        result.setVertex(a.get_vertex_count() + b.get_vertex_count() - 1);
         //System.out.println("count"+a.get_vertex_count()+"countb"+b.get_vertex_count());
         int i;
         Transicion new_trans;
@@ -189,7 +186,7 @@ public class EvalPost {
         // System.out.println("count"+a.get_vertex_count()+"fina"+a.getFinal_state());
         for (i = 1; i < b.getTransicions().size(); i++) {
             new_trans = b.getTransicions().elementAt(i);
-            result.setTransicions(new_trans.getVertex_from() + a.get_vertex_count()-1, new_trans.getVertex_to() + a.get_vertex_count()-1, new_trans.getTrans_symbol());
+            result.setTransicions(new_trans.getVertex_from() + a.get_vertex_count() - 1, new_trans.getVertex_to() + a.get_vertex_count() - 1, new_trans.getTrans_symbol());
             //System.out.println((new_trans.getVertex_from() + a.get_vertex_count()-1)+" "+(new_trans.getVertex_to()+ a.get_vertex_count()-1)+""+new_trans.getTrans_symbol());
         }
         result.setFinal_state(a.get_vertex_count() + b.get_vertex_count() - 2);
@@ -227,11 +224,13 @@ public class EvalPost {
         result.setFinal_state(vertex_count - 1);
         return result;
     }
+
     /**
-     *  Metodo para simular un eclosure
-     * @param S       Arreglo de estados
-     * @param nfa     Automata finido no determinista
-     * @return        La lista de estados alcanzados con eclosure
+     * Metodo para simular un eclosure
+     *
+     * @param S   Arreglo de estados
+     * @param nfa Automata finido no determinista
+     * @return La lista de estados alcanzados con eclosure
      */
     ArrayList<String> eClosure(ArrayList<String> S, NFA nfa) {
         Stack<String> pila = new Stack<String>();
@@ -268,53 +267,57 @@ public class EvalPost {
         return listString;*/
         return ListaClosures;
     }
+
     /**
-     *  Metodo para simular un move de un NFA.
-     * @param S       Arreglo de estados
-     * @param a       Simbolo de lenguaje
-     * @param nfa     Automata finido no determinista
-     * @return        La lista de estados alcanzados con move
+     * Metodo para simular un move de un NFA.
+     *
+     * @param S   Arreglo de estados
+     * @param a   Simbolo de lenguaje
+     * @param nfa Automata finido no determinista
+     * @return La lista de estados alcanzados con move
      */
     ArrayList<String> move(ArrayList<String> S, String a, NFA nfa) {
         ArrayList<String> lista = new ArrayList<String>();
         //for (String s : S) {
-            for (Transicion edge : nfa.getTransicions()) {
-                if (S.contains(""+edge.getVertex_from()) && edge.getTrans_symbol().equals(a)) {
-                    lista.add("" + edge.getVertex_to());
-                }
+        for (Transicion edge : nfa.getTransicions()) {
+            if (S.contains("" + edge.getVertex_from()) && edge.getTrans_symbol().equals(a)) {
+                lista.add("" + edge.getVertex_to());
             }
+        }
         //}
         return lista;
     }
+
     /**
-     *  Metodo para simular un move de un DFA.
-     * @param S       Arreglo de estados
-     * @param a       Simbolo de lenguaje
-     * @param dfa     Automata finido no determinista
-     * @return        La lista de estados alcanzados con move
+     * Metodo para simular un move de un DFA.
+     *
+     * @param S   Arreglo de estados
+     * @param a   Simbolo de lenguaje
+     * @param dfa Automata finido no determinista
+     * @return La lista de estados alcanzados con move
      */
     ArrayList<String> move(ArrayList<String> S, String a, DFA dfa) {
         ArrayList<String> lista = new ArrayList<String>();
-        //System.out.println("Entre"+S.toString());
-        if(S.get(0).length() == 1){
-            for (TransicionDFA edge : dfa.getTransicions()) {
+        //System.out.println("Entre"+S.toString()+"y signo: "+a);
+        Vector<TransicionDFA> tr = dfa.getTransicions();
+        if (S.get(0).length() == 1) {
+            for (TransicionDFA edge : tr) {
                 for (char ch : edge.getVertex_from().toCharArray()) {
                     if (S.contains("" + ch) && !lista.contains(edge.getVertex_to())) {
                         lista.add("" + edge.getVertex_to());
                     }
                 }
             }
-        }
-        else{
-            for (TransicionDFA edge : dfa.getTransicions()) {
+        } else {
+            for (TransicionDFA edge : tr) {
                 if (edge.getTrans_symbol().equals(a)) {
-                    if (S.contains(""+edge.getVertex_from())&& !lista.contains(edge.getVertex_to())) {
+                    if (S.contains("" + edge.getVertex_from()) && !lista.contains(edge.getVertex_to())) {
                         lista.add("" + edge.getVertex_to());
                     }
                 }
             }
         }
-
+        //System.out.println("lista"+lista.toString());
         return lista;
     }
 
@@ -327,35 +330,35 @@ public class EvalPost {
     DFA nfaToDFA(NFA nfa, ArrayList<String> simb) {
         DFA dfa = new DFA();
         ArrayList<String> temp = new ArrayList<String>();
-        temp.add(""+nfa.getVertex().get(0));
+        temp.add("" + nfa.getVertex().get(0));
         //LinkedHashSet<State> setdfa= new LinkedHashSet<State>();
-        ArrayList<ArrayList<String>> setdfa= new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<String>> setdfa = new ArrayList<ArrayList<String>>();
         ArrayList<Boolean> b = new ArrayList<Boolean>();
-        setdfa.add(eClosure(temp,nfa));
+        setdfa.add(eClosure(temp, nfa));
         b.add(false);
-        int i=0;
+        int i = 0;
         ArrayList<String> S = new ArrayList<String>();
-        while(b.get(i)==false){
+        while (b.get(i) == false) {
             // System.out.println("i"+i);
-            b.set(i,true);
-           // System.out.println("size"+b.size());
-            for (String a: simb){
+            b.set(i, true);
+            // System.out.println("size"+b.size());
+            for (String a : simb) {
                 //System.out.println(a);
-                S= eClosure(move(setdfa.get(i),a,nfa),nfa);
+                S = eClosure(move(setdfa.get(i), a, nfa), nfa);
                 //System.out.println(setdfa.get(i).toString()+"kk1");
                 //System.out.println(move(setdfa.get(i),a,nfa).toString()+"kk2");
                 //System.out.println("aqui si"+S.toString());
-                if (!setdfa.contains(S)){
+                if (!setdfa.contains(S)) {
                     setdfa.add(S);
                     b.add(false);
                 }
                 boolean final1 = false;
-                boolean final2  = false;
+                boolean final2 = false;
                 String listString = "";
                 String listString2 = "";
-                for (String s :setdfa.get(i) ){
+                for (String s : setdfa.get(i)) {
                     listString += s;
-                    if (s.equals(""+nfa.getFinal_state())){
+                    if (s.equals("" + nfa.getFinal_state())) {
                         final1 = true;
                     }
                     //System.out.println("setdfa"+listString);
@@ -363,9 +366,9 @@ public class EvalPost {
 
                 //listString=listString.substring(0, listString.length() - 1);
                 //listString+=")";
-                for (String s :S ){
+                for (String s : S) {
                     listString2 += s;
-                    if (s.equals(""+nfa.getFinal_state()) ){
+                    if (s.equals("" + nfa.getFinal_state())) {
                         final2 = true;
                     }
                     //System.out.println("S"+listString2);
@@ -374,17 +377,20 @@ public class EvalPost {
                 //listString2+=")";
                 //System.out.println("listString"+listString);
                 //System.out.println("listString2"+listString2);
-                dfa.setVertex(listString);
-                dfa.setTransicions(listString,listString2,a);
-                if (final1 && !dfa.getFinal_state().contains(listString) ){
-                    dfa.setFinal_state(listString);
+                if (!listString.equals("") && !listString2.equals("") ){
+                    dfa.setVertex(listString);
+                    dfa.setTransicions(listString, listString2, a);
+                    if (final1 && !dfa.getFinal_state().contains(listString)) {
+                        dfa.setFinal_state(listString);
+                    }
+                    if (final2 && !dfa.getFinal_state().contains(listString2)) {
+                        dfa.setFinal_state(listString2);
+                    }
                 }
-                if (final2 && !dfa.getFinal_state().contains(listString2)){
-                    dfa.setFinal_state(listString2);
-                }
+
             }
             i++;
-            if(i==b.size()){
+            if (i == b.size()) {
                 break;
             }
         }
@@ -397,22 +403,23 @@ public class EvalPost {
     * @param nfa que sera el automata que decide si acepta o no la expresion
     * @return cadena que informa si la expresion es aceptada o no
     * */
-    String simulacionNFA(String a,NFA nfa) {
+    String simulacionNFA(String a, NFA nfa) {
         ArrayList<String> S = new ArrayList<String>();
-        S.add(""+0);
-        S = eClosure(S,nfa);
-        for (char ch : a.toCharArray()){
-            S=eClosure(move(S,""+ch,nfa),nfa);
+        S.add("" + 0);
+        S = eClosure(S, nfa);
+        for (char ch : a.toCharArray()) {
+            S = eClosure(move(S, "" + ch, nfa), nfa);
         }
-        String temp = ""+nfa.getFinal_state();
-        String o="No se acepta";
-        for ( String s: S){
-            if (s.equals(temp)){
+        String temp = "" + nfa.getFinal_state();
+        String o = "No se acepta";
+        for (String s : S) {
+            if (s.equals(temp)) {
                 o = "Se acepta";
             }
         }
         return o;
     }
+
     /*
    * Metodo para simular la corrida de una expresion en un automata DFA
    * @param a cadena que contiene los simbolos del lenguaje
@@ -421,16 +428,16 @@ public class EvalPost {
    * */
     String simulacionDFA(String a, DFA dfa) {
         ArrayList<String> S = new ArrayList<String>();
-        S.add(""+0);
-        for (char ch : a.toCharArray()){
-            S=move(S,""+ch,dfa);
+        S.add("" + 0);
+        for (char ch : a.toCharArray()) {
+            S = move(S, "" + ch, dfa);
         }
-        String o="No se acepta";
-       for ( String s: S){
-            for (String s2: dfa.getFinal_state()){
-                if (s.equals(s2)){
-                    o = "Se acepta";
-                    break;
+        Vector<String> v = dfa.getFinal_state();
+        String o = "No se acepta";
+        for (String s : S) {
+            for (String s2 :v) {
+                if (s.equals(s2)) {
+                    return "Se acepta";
                 }
             }
         }

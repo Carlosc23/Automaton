@@ -1,12 +1,16 @@
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
+import org.graphstream.ui.view.Viewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
+
 
 /**
  * @author Carlos Calderon
@@ -19,6 +23,7 @@ public class DFA extends Component {
     private Vector<TransicionDFA> transicions = new Vector<TransicionDFA>();
     private Vector<String> final_state = new Vector<String>();
     Graph graph = new SingleGraph("Automata");
+    Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
 
     /**
      * Metodo constructor
@@ -124,19 +129,25 @@ public class DFA extends Component {
      * Metodo para desplegar un grafo y llenarlo.
      */
     void desplegarGrafo() {
+       // Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         graph.addAttribute("ui.stylesheet", "node {fill-color: red; size-mode: dyn-size;} edge {fill-color:grey;}");
         System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+
         TransicionDFA new_trans;
         for (String j : vertex) {
             Node a = graph.addNode(String.valueOf(j));
             a.addAttribute("ui.label", "q" + j);
         }
+        Set<TransicionDFA> set = new HashSet<TransicionDFA>(transicions);
         for (int i = 0; i < transicions.size(); i++) {
             new_trans = transicions.elementAt(i);
             Edge e = graph.addEdge("q" + new_trans.getVertex_from() + " --> q" + new_trans.getVertex_to(), String.valueOf(new_trans.getVertex_from()),
                     String.valueOf(new_trans.getVertex_to()), true);
             e.setAttribute("ui.label", new_trans.getTrans_symbol());
+            System.out.println(new_trans.getVertex_from()+"--"+new_trans.getVertex_to()+"--"+new_trans.trans_symbol);
         }
+
+
         graph.display();
     }
 
